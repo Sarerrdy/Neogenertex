@@ -1,0 +1,39 @@
+ScreenManager:
+    MainScreen:
+    MenuScreen:
+    ScanMenuScreen:
+        name: 'scan_menu'
+    PrintMenuScreen:
+        name: 'print_menu'
+
+<MainScreen>:
+    name: 'main'
+    BoxLayout:
+        orientation: 'vertical'       
+        Video:
+            id: video            
+            source:  app.get_video_path()
+            state: "play"
+            loaded: True
+            size_hint: 1, 1
+            pos_hint: {'center_x': 0.5,'center_y': 0.5}
+            options: {"eos": "loop"}
+            on_play: app.on_video_play
+        
+<MenuScreen>:
+    name: 'menu'
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'Print'
+            on_press: app.print_function()
+        Button:
+            text: 'Scan'
+            on_press: app.scan_function()
+        Button:
+            text: 'Access Internet'
+            on_press: app.access_internet_function()
+        
+        Button:
+            text: 'Exit Kiosk'
+            on_press: app.stop_app()

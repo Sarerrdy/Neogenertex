@@ -1,0 +1,36 @@
+{
+	"folders": [
+	  {
+		"path": "backend"
+	  },
+	  {
+		"path": "frontend"
+	  }
+	],
+	"settings": {
+	  "python.terminal.activateEnvironment": true,
+	  "terminal.integrated.profiles.linux": {
+		"frontend": {
+		  "path": "bash",
+		  "args": [
+			"-c",
+			"cd /home/sarerrdy/Works/Neogenertex/frontend && pipenv shell"
+		  ]
+		},
+		"backend": {
+		  "path": "bash",
+		  "args": [
+			"-c",
+			"cd /home/sarerrdy/Works/Neogenertex/backend && source venv/bin/activate"
+		  ]
+		}
+	  },
+	  "terminal.integrated.defaultProfile.linux": "bash"
+	},
+	"extensions": {
+	  "recommendations": [
+		"ms-python.python"
+	  ]
+	}
+  }
+  
