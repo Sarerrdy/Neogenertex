@@ -6,11 +6,12 @@ name = "pypi"
 [packages]
 kivy = "*"
 ffpyplayer = "*"
-pyqt5 = "*"
 pytesseract = "*"
 pillow = "*"
 opencv-python = "*"
 fpdf = "*"
+faker = "*"
+pyscard = "*"
 
 [dev-packages]
 

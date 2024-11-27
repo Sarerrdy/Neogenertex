@@ -10,6 +10,7 @@ from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.filechooser import FileChooserListView
+from pay import PaymentPopup
 
 
 class PrintMenu(BoxLayout):
@@ -64,7 +65,7 @@ class PrintMenu(BoxLayout):
         # Add a button to print the file
         self.print_button = Button(
             text='Print', size_hint=(None, None),  size=(300, 50))
-        self.print_button.bind(on_press=self.print_file)
+        self.print_button.bind(on_press=self.start_payment_process)
         button_box.add_widget(self.print_button)
 
         # Add a cancel button
@@ -105,7 +106,19 @@ class PrintMenu(BoxLayout):
         if selection:
             self.file_label.text = selection[0]
 
-    def print_file(self, instance):
+    def start_payment_process(self, instance):
+        popup = PaymentPopup(self.payment_callback)
+        popup.open()
+
+    def payment_callback(self, success):
+        if success:
+            self.print_file()
+        else:
+            error_popup = Popup(title="Payment Failed", content=Label(
+                text="Payment failed. Please try again."), size_hint=(0.8, 0.4))
+            error_popup.open()
+
+    def print_file(self):
         try:
             # Get the printing options
             file_path = self.file_label.text
@@ -149,6 +162,3 @@ class PrintMenu(BoxLayout):
 
         app = App.get_running_app()
         app.root.current = 'menu'
-
-        # Call the on_enter method manually
-        # self.root.get_screen('menu').on_enter()

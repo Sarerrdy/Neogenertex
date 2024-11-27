@@ -71,14 +71,10 @@ class MenuScreen(Screen):
 class KioskApp(App):
     def __init__(self, **kwargs):
         super(KioskApp, self).__init__(**kwargs)
-        # self.menu_screen_active_alone = False
-        # self.print_popup = None
-        # self.print_menu = PrintMenu()
 
     def build(self):
         print("KioskApp build method called")
         return Builder.load_file('main.kv')
-        
 
     def get_video_path(self):
         return video_path
@@ -115,11 +111,6 @@ class ScanMenuScreen(Screen):
 class PrintMenuScreen(Screen):
     def __init__(self, **kwargs):
         super(PrintMenuScreen, self).__init__(**kwargs)
-        # self.layout = BoxLayout(orientation='vertical')
-        # self.print_menu = PrintMenu()
-        # self.print_menu.print_function()
-        # self.layout.add_widget(self.print_menu.print_popup)
-        # self.add_widget(self.layout)
 
         self.layout = PrintMenu()
         self.add_widget(self.layout)
