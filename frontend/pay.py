@@ -1,9 +1,9 @@
-from kivy.app import App
+
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
-from kivy.uix.textinput import TextInput
+from kivy.uix.image import Image
 from kivy.clock import Clock
 import requests
 from smartcard.System import readers
@@ -36,7 +36,6 @@ class PaymentPopup(Popup):
                             color=(1, 1, 1, 1),
                             on_press=self.read_card)
         layout.add_widget(pay_button)
-
         self.add_widget(layout)
 
     def read_card(self, instance):

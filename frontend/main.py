@@ -1,11 +1,9 @@
 import os
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import Screen
 from kivy.clock import Clock
 from scan_menu import ScanMenu
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.image import Image
 from print_menu import PrintMenu
 from kivy.core.window import Window
 
@@ -16,8 +14,9 @@ video_path = os.path.join(os.path.dirname(
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
-        Window.minimum_width = 1024
-        Window.minimum_height = 800
+        Window.minimum_width = 1400
+        Window.minimum_height = 900
+        # Window.fullscreen = True
         self.idle_event = None
 
     def on_touch_down(self, touch):
@@ -50,20 +49,18 @@ class MenuScreen(Screen):
         self.idle_event = Clock.schedule_once(self.resume_video, 10)
 
         # Call the superclass method
-        super(MenuScreen, self).on_touch_down(touch)
+        return super(MenuScreen, self).on_touch_down(touch)
 
     def on_enter(self):
-        print("on_enter Scheduller video called")
+        print("on_enter Scheduler video called")
         self.idle_event = Clock.schedule_once(self.resume_video, 10)
 
     def resume_video(self, dt):
         print("Resume video called")
-        # Check if the MenuScreen is the current screen
         app = App.get_running_app()
-        print("Before Confirmed current screen as main")
-        # if self.manager.current == 'menu' and not app.print_popup and not app.print_message:
-        if self.manager.current == 'menu':
-            print("After Confirmed current screen as main")
+        # Check if the MenuScreen is the current screen and no popups are active
+        if self.manager.current == 'menu' and not self.has_active_popups():
+            print("Confirmed current screen as main and no active popups")
             # Navigate back to the MainScreen
             self.manager.current = 'main'
 
@@ -72,6 +69,15 @@ class MenuScreen(Screen):
             video.state = 'play'
             video.opacity = 1
 
+    def has_active_popups(self):
+        # Check for active popups or sub-windows
+        from kivy.uix.popup import Popup
+        app = App.get_running_app()
+        for widget in app.root.walk():
+            if isinstance(widget, Popup):
+                return True
+        return False
+
 
 class KioskApp(App):
     def __init__(self, **kwargs):
@@ -79,17 +85,12 @@ class KioskApp(App):
 
     def build(self):
         print("KioskApp build method called")
-        # Set the window size to 56.25% of screen width and approximately 99.9% of screen height
-        Window.size_hint = (0.5625, 0.999)
-        Window.aspect_ratio = 9/16  # Set the aspect ratio to 9:16
-        # Window.fullscreen = True  # Set the app to fullscreen mode
         return Builder.load_file('main.kv')
 
     def get_video_path(self):
         return video_path
 
     def print_function(self):
-        # self.print_menu.print_function()
         self.root.current = 'print_menu'
 
     def scan_function(self):
@@ -113,14 +114,12 @@ class ScanMenuScreen(Screen):
         self.add_widget(self.layout)
 
     def scan_document(self):
-        # Your scanning functionality here
         print('Scanning document...')
 
 
 class PrintMenuScreen(Screen):
     def __init__(self, **kwargs):
         super(PrintMenuScreen, self).__init__(**kwargs)
-
         self.layout = PrintMenu()
         self.add_widget(self.layout)
 

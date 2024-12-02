@@ -26,23 +26,48 @@ class PrintMenu(BoxLayout):
         self.file_label = Label(text='Select a file to print', font_size=24)
         self.add_widget(self.file_label)
 
-        # self.file_chooser = FileChooserListView(path='/')
-        # self.add_widget(self.file_chooser)
-
         self.file_chooser = FileChooserListView(
-            path='/', filters=['*.pdf', '*.txt'])  # Filters for file types
+            path='/home/', filters=['*.pdf', '*.txt'])  # Filters for file types
         self.file_chooser.bind(selection=self.on_file_select)
         self.add_widget(self.file_chooser)
 
-        # Update file_label with the selected file path
+        # Create a horizontal BoxLayout for the buttons
+        button_layout = BoxLayout(
+            orientation='horizontal', spacing=10, size_hint=(1, None), height=50)
+
+        self.cancel_select_button = Button(
+            text='Cancel', font_size=24, size_hint=(0.5, 1))
+        self.cancel_select_button.bind(on_press=self.dismiss_select_file)
+        button_layout.add_widget(self.cancel_select_button)
+
+        self.preview_button = Button(
+            text='Preview', font_size=24, size_hint=(0.5, 1))
+        self.preview_button.bind(on_press=self.preview_text)
+        button_layout.add_widget(self.preview_button)
+
+        self.add_widget(button_layout)
+
     def on_file_select(self, instance, value):
         if value:
             self.file_label.text = value[0]
 
-        self.preview_button = Button(
-            text='Preview', font_size=24, size_hint=(1, None), size=(100, 50))
-        self.preview_button.bind(on_press=self.preview_text)
-        self.add_widget(self.preview_button)
+    def dismiss_select_file(self, instance):
+        # Remove or hide the file chooser and buttons
+        # self.remove_widget(self.file_chooser)
+        # self.remove_widget(self.file_label)
+        # Return to the main menu
+        app = App.get_running_app()
+        app.root.current = 'menu'
+
+    #     # Update file_label with the selected file path
+    # def on_file_select(self, instance, value):
+    #     if value:
+    #         self.file_label.text = value[0]
+
+    #     self.preview_button = Button(
+    #         text='Preview', font_size=24, size_hint=(1, None), size=(100, 50))
+    #     self.preview_button.bind(on_press=self.preview_text)
+    #     self.add_widget(self.preview_button)
 
     def preview_text(self, instance):
         file_path = self.file_chooser.selection[0]
@@ -184,11 +209,6 @@ class PrintMenu(BoxLayout):
     def start_payment_process(self, total_cost):
         popup = PaymentPopup(self.payment_callback, total_cost)
         popup.open()
-        # self.payment_process(total_cost)
-
-    # def payment_process(self, total_cost):
-    #     popup = PaymentPopup(self.payment_callback, total_cost)
-    #     popup.open()
 
     def payment_callback(self, success):
         if success:
@@ -248,7 +268,7 @@ class PrintMenu(BoxLayout):
         summary_layout = BoxLayout(orientation='vertical')
         summary_label = Label(text=f'Page Numbers: {page_numbers}\n'
                               f'Number of Copies: {num_copies}\n'
-                              f'Total Cost: {total_cost}',
+                              f'Total Cost: R{total_cost}',
                               font_size=16, text_size=(500, None), valign='middle', halign='left', size_hint=(1, None), height=400)
 
         summary_label.height = len(summary_label.text.split(
@@ -324,7 +344,7 @@ class PrintMenu(BoxLayout):
             Clock.schedule_once(
                 lambda dt: self.dismiss_popup(print_success_popup), 3)
             Clock.schedule_once(
-                lambda dt: self.dismiss_preview(), 3)
+                lambda dt: self.dismiss_preview(), 4)
 
         except Exception as e:
             error_message = str(e)
@@ -360,7 +380,7 @@ class PrintMenu(BoxLayout):
                 text='Please enter both page numbers and copies'),
                 size_hint=(None, None), size=(400, 200))
             popup.open()
-            Clock.schedule_once(lambda dt: self.dismiss_popup(popup), 2)
+            Clock.schedule_once(lambda dt: self.dismiss_popup(popup), 4)
             return False
         return True
 
