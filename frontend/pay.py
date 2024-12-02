@@ -13,21 +13,28 @@ import random
 
 
 class PaymentPopup(Popup):
-    def __init__(self, callback, **kwargs):
+    def __init__(self, callback, total_cost, **kwargs):
         super().__init__(**kwargs)
         self.callback = callback
+        self.total_cost = total_cost
         self.title = "Payment"
-        self.size_hint = (0.8, 0.6)
+        self.size_hint = (0.4, 0.3)
 
         layout = BoxLayout(orientation='vertical')
-        self.label = Label(text="Please insert your card into the reader.")
+
+        total_cost_label = Label(
+            text=f"Total Cost: R{self.total_cost}", font_size=16)
+        layout.add_widget(total_cost_label)
+
+        self.label = Label(
+            text="Please insert your card into the reader.", font_size=16, bold=True)
         layout.add_widget(self.label)
 
-        self.amount_input = TextInput(
-            hint_text="Enter amount in Rand", multiline=False, input_filter='int')
-        layout.add_widget(self.amount_input)
-
-        pay_button = Button(text="Read Card", on_press=self.read_card)
+        pay_button = Button(text="Pay Now",
+                            size=(100, 50),
+                            background_color=(0, 1, 0, 1),  # Green color
+                            color=(1, 1, 1, 1),
+                            on_press=self.read_card)
         layout.add_widget(pay_button)
 
         self.add_widget(layout)
@@ -42,20 +49,13 @@ class PaymentPopup(Popup):
                     0x00, 0x00, 0x03, 0x80, 0x02, 0x00, 0x00, 0x00]
             response, sw1, sw2 = connection.transmit(apdu)
             card_data = toHexString(response)
-            self.process_payment(card_data)
+            self.process_payment(card_data, self.total_cost)
         else:
-            self.label.text = "No card reader found. Using dummy card data for testing."
+            # self.label.text = "No card reader found. Using dummy card data for testing."
             dummy_card_data = "4111111111111111"  # Dummy card number
-            self.process_payment(dummy_card_data)
+            self.process_payment(dummy_card_data, self.total_cost)
 
-    def process_payment(self, card_data):
-        try:
-            amount = int(self.amount_input.text)  # User-defined amount in Rand
-        except ValueError:
-            error_popup = Popup(title="Invalid Amount", content=Label(
-                text="Please enter a valid amount."), size_hint=(0.8, 0.4))
-            error_popup.open()
-            return
+    def process_payment(self, card_data, amount):
 
         reference = self.generate_payment_reference()
 
@@ -70,20 +70,23 @@ class PaymentPopup(Popup):
             'card_number': card_data,
             'passphrase': 'Test my Neogenertex'
         })
-
         if response.status_code == 200:
             self.dismiss()
             success_popup = Popup(title="Payment Successful", content=Label(
-                text="Payment was successful!"), size_hint=(0.8, 0.4))
+                text="Payment was successful!"), size_hint=(0.4, 0.3))
             success_popup.open()
             # Pass success status to callback
             Clock.schedule_once(lambda dt: self.callback(True), 1)
+            Clock.schedule_once(
+                lambda dt: self.close_payment_popup(success_popup), 4)
         else:
             error_popup = Popup(title="Payment Failed", content=Label(
-                text="Payment failed. Please try again."), size_hint=(0.8, 0.4))
+                text="Payment failed. Please try again."), size_hint=(0.4, 0.3))
             error_popup.open()
             # Pass failure status to callback
             Clock.schedule_once(lambda dt: self.callback(False), 1)
+            Clock.schedule_once(
+                lambda dt: self.close_payment_popup(error_popup), 4)
 
     def generate_payment_reference(self):
         prefix = "PAY"
@@ -92,29 +95,7 @@ class PaymentPopup(Popup):
         reference = f"{prefix}-{date_str}-{unique_id}"
         return reference
 
-
-class MyApp(App):
-    def build(self):
-        layout = BoxLayout(orientation='vertical')
-        hello_label = Label(text="Hello World", font_size='20sp')
-        layout.add_widget(hello_label)
-
-        pay_button = Button(text="Test Pay", font_size='20sp')
-        pay_button.bind(on_press=self.show_payment_popup)
-        layout.add_widget(pay_button)
-
-        return layout
-
-    def show_payment_popup(self, instance):
-        popup = PaymentPopup(self.payment_callback)
-        popup.open()
-
-    def payment_callback(self, success):
-        if success:
-            print("Payment was successful!")
-        else:
-            print("Payment failed.")
-
-
-if __name__ == "__main__":
-    MyApp().run()
+    def close_payment_popup(self, pop):
+        print("Dismissing popup...")
+        pop.dismiss()
+        print("Popup dismissed.")

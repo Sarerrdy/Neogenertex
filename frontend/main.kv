@@ -1,4 +1,4 @@
-ScreenManager:
+ScreenManager:    
     MainScreen:
     MenuScreen:
     ScanMenuScreen:
@@ -8,8 +8,22 @@ ScreenManager:
 
 <MainScreen>:
     name: 'main'
-    BoxLayout:
-        orientation: 'vertical'       
+    BoxLayout:        
+        orientation: 'vertical'
+        anchor_x: 'center'
+        anchor_y: 'center'
+        size_hint: 1, 1
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5} 
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        # Image:
+        #     source: 'background.png'
+        #     size_hint: 1, 1
+        #     pos_hint: {'center_x': 0.5, 'center_y': 0.5}       
         Video:
             id: video            
             source:  app.get_video_path()
@@ -24,6 +38,9 @@ ScreenManager:
     name: 'menu'
     BoxLayout:
         orientation: 'vertical'
+        orientation: 'vertical'
+        size_hint: 1, 1
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         Button:
             text: 'Print'
             on_press: app.print_function()

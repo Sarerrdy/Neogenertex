@@ -12,6 +12,9 @@ opencv-python = "*"
 fpdf = "*"
 faker = "*"
 pyscard = "*"
+pypdf2 = "*"
+pdf2image = "*"
+chardet = "*"
 
 [dev-packages]
 

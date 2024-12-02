@@ -5,14 +5,19 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 from scan_menu import ScanMenu
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import Image
 from print_menu import PrintMenu
+from kivy.core.window import Window
 
-video_path = os.path.join(os.path.dirname(__file__), 'resources', 'advert.mp4')
+video_path = os.path.join(os.path.dirname(
+    __file__), 'resources', 'neo_advert-VEED.mp4')
 
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
+        Window.minimum_width = 1024
+        Window.minimum_height = 800
         self.idle_event = None
 
     def on_touch_down(self, touch):
@@ -74,6 +79,10 @@ class KioskApp(App):
 
     def build(self):
         print("KioskApp build method called")
+        # Set the window size to 56.25% of screen width and approximately 99.9% of screen height
+        Window.size_hint = (0.5625, 0.999)
+        Window.aspect_ratio = 9/16  # Set the aspect ratio to 9:16
+        # Window.fullscreen = True  # Set the app to fullscreen mode
         return Builder.load_file('main.kv')
 
     def get_video_path(self):
