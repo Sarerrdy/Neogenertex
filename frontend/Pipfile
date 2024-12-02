@@ -4,17 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-kivy = "*"
-ffpyplayer = "*"
-pytesseract = "*"
-pillow = "*"
-opencv-python = "*"
-fpdf = "*"
-faker = "*"
 pyscard = "*"
 pypdf2 = "*"
+<<<<<<< Updated upstream
 pdf2image = "*"
 chardet = "*"
+=======
+chardet = "*"
+pdf2image = "*"
+>>>>>>> Stashed changes
 
 [dev-packages]
 

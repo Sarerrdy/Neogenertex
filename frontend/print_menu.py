@@ -30,6 +30,7 @@ class PrintMenu(BoxLayout):
             path='/home/', filters=['*.pdf', '*.txt'])  # Filters for file types
         self.file_chooser.bind(selection=self.on_file_select)
         self.add_widget(self.file_chooser)
+<<<<<<< Updated upstream
 
         # Create a horizontal BoxLayout for the buttons
         button_layout = BoxLayout(
@@ -69,10 +70,24 @@ class PrintMenu(BoxLayout):
     #     self.preview_button.bind(on_press=self.preview_text)
     #     self.add_widget(self.preview_button)
 
+=======
+
+        # Update file_label with the selected file path
+    def on_file_select(self, instance, value):
+        if value:
+            self.file_label.text = value[0]
+
+        self.preview_button = Button(
+            text='Preview', font_size=24, size_hint=(1, None), size=(100, 50))
+        self.preview_button.bind(on_press=self.preview_text)
+        self.add_widget(self.preview_button)
+
+>>>>>>> Stashed changes
     def preview_text(self, instance):
         file_path = self.file_chooser.selection[0]
         self.pages = self.read_file(file_path)
         layout = self._create_layout()
+<<<<<<< Updated upstream
 
         # Ensure scroll view supports mouse and touch scrolling
         scrollview = ScrollView(
@@ -206,9 +221,149 @@ class PrintMenu(BoxLayout):
     def dismiss_preview(self, instance=None):
         self.preview_popup.dismiss()
 
+=======
+
+        # Ensure scroll view supports mouse and touch scrolling
+        scrollview = ScrollView(
+            scroll_type=['bars', 'content'], bar_width=10, size_hint=(1, .1))
+        grid_layout = self._create_grid_layout()
+        self.text_input = self._create_text_input()
+        self.text_input.text = self.pages[0]
+        page_layout = self._create_page_layout()
+        page_layout.add_widget(self.text_input)
+        grid_layout.add_widget(page_layout)
+        scrollview.add_widget(grid_layout)
+        layout.add_widget(scrollview)
+        navigation_layout = self._create_navigation_layout()
+        layout.add_widget(navigation_layout)
+        button_layout = BoxLayout(orientation='horizontal')
+        button_layout = self._create_button_layout()
+        layout.add_widget(button_layout)
+        self.preview_popup = Popup(
+            title='Text Preview', content=layout, size_hint=(0.8, 0.8))
+        self.preview_popup.open()
+        self.current_page = 1
+        scrollview.scroll_y = 0
+        grid_layout.height = self.text_input.height
+
+    def read_file(self, file_path):
+        with open(file_path, 'r') as file:
+            text = file.read()
+            pages = []
+            while text:
+                page, text = text[:2500], text[2500:]
+                pages.append(page)
+            return pages
+
+    def _create_layout(self):
+        layout = BoxLayout(orientation='vertical')
+        return layout
+
+    def _create_grid_layout(self):
+        grid_layout = GridLayout(cols=1, size_hint=(1, 1))
+        return grid_layout
+
+    def _create_text_input(self):
+        text_input = TextInput(multiline=True, font_size=24)
+        return text_input
+
+    def _create_page_layout(self):
+        page_layout = BoxLayout(orientation='vertical')
+        return page_layout
+
+    def _create_navigation_layout(self):
+        navigation_layout = BoxLayout(
+            orientation='horizontal', size_hint=(None, None), size=(400, 50))
+        navigation_layout.pos_hint = {'center_x': 0.5}  # Center horizontally
+        navigation_layout.spacing = 10  # Add some space between widgets
+        # Add some padding to center the widgets
+        navigation_layout.padding = (20, 0)
+
+        previous_button = Button(text='Previous', font_size=18,
+                                 font_name='Roboto', size_hint=(None, None), size=(100, 50))
+        previous_button.bind(on_press=self.previous_page)
+        navigation_layout.add_widget(previous_button)
+
+        self.current_page_label = Label(
+            text=f'Page 1 of {len(self.pages)}', font_size=18, font_name='Roboto')
+        self.current_page_label.size_hint = (
+            None, None)  # Set size hint to None
+        self.current_page_label.width = 200  # Set a fixed width
+        self.current_page_label.valign = 'middle'  # Center vertically
+        self.current_page_label.halign = 'center'  # Center horizontally
+        self.current_page_label.padding = (
+            0, 20, 0, 0)  # Add padding to the top
+        navigation_layout.add_widget(self.current_page_label)
+
+        next_button = Button(text='Next', font_size=18, font_name='Roboto', size_hint=(
+            None, None), size=(100, 50))
+        next_button.bind(on_press=self.next_page)
+        navigation_layout.add_widget(next_button)
+        return navigation_layout
+
+    def _create_button_layout(self):
+        button_layout = BoxLayout(
+            orientation='horizontal', size_hint=(1, None), height=50)
+        left_layout = BoxLayout(orientation='horizontal', size_hint=(0.5, 1))
+        cancel_button = Button(text='Cancel', font_size=18, font_name='Roboto', size_hint=(
+            None, None), size=(100, 50))
+        cancel_button.bind(on_press=self.dismiss_preview)
+        left_layout.add_widget(cancel_button)
+        print_button = Button(text='Print', font_size=18, font_name='Roboto', size_hint=(
+            None, None), size=(100, 50))
+        print_button.bind(on_press=self.calculate_print_cost)
+        left_layout.add_widget(print_button)
+        button_layout.add_widget(left_layout)
+        right_layout = BoxLayout(
+            orientation='horizontal', size_hint=(None, None), size=(600, 50),
+            pos_hint={'right': 0, 'bottom': 1})
+        self.set_page_numbers_label = Label(
+            text='Pages:', size_hint=(None, None), size=(60, 44), font_size=18, font_name='Roboto')
+        right_layout.add_widget(self.set_page_numbers_label)
+        self.preview_page_numbers_input = TextInput(
+            hint_text='e.g. 1-3, 5, All', size_hint=(None, None), size=(120, 44), font_size=18)
+        right_layout.add_widget(self.preview_page_numbers_input)
+
+        self.set_copies_label = Label(
+            text='copies:', size_hint=(None, None), size=(60, 44), font_size=18, font_name='Roboto')
+        right_layout.add_widget(self.set_copies_label)
+        self.preview_copies_input = TextInput(hint_text='1', size_hint=(
+            None, None), size=(50, 44), font_size=18, input_filter='int')
+        right_layout.add_widget(self.preview_copies_input)
+
+        self.set_color_label = Label(
+            text='Color:', size_hint=(None, None), size=(60, 44), font_size=18, font_name='Roboto')
+        right_layout.add_widget(self.set_color_label)
+        self.preview_color_spinner = Spinner(text='Color', values=(
+            'Color', 'Gray'), size_hint=(None, None), size=(70, 44), font_size=18)
+        right_layout.add_widget(self.preview_color_spinner)
+        button_layout.add_widget(right_layout)
+        return button_layout
+
+    def next_page(self, instance):
+        if self.current_page < len(self.pages):
+            self.current_page += 1
+            self.text_input.text = self.pages[self.current_page-1]
+            self.current_page_label.text = f'Page {self.current_page} of {len(self.pages)}'
+
+    def previous_page(self, instance):
+        if self.current_page > 1:
+            self.current_page -= 1
+            self.text_input.text = self.pages[self.current_page-1]
+            self.current_page_label.text = f'Page {self.current_page} of {len(self.pages)}'
+
+    def dismiss_preview(self, instance=None):
+        self.preview_popup.dismiss()
+
+>>>>>>> Stashed changes
     def start_payment_process(self, total_cost):
         popup = PaymentPopup(self.payment_callback, total_cost)
         popup.open()
+        # self.payment_process(total_cost)
+
+    # def payment_process(self, total_cost):
+    #     popup = PaymentPopup(self.payment_callback, total_cost)
+    #     popup.open()
 
     def payment_callback(self, success):
         if success:
@@ -268,7 +423,11 @@ class PrintMenu(BoxLayout):
         summary_layout = BoxLayout(orientation='vertical')
         summary_label = Label(text=f'Page Numbers: {page_numbers}\n'
                               f'Number of Copies: {num_copies}\n'
+<<<<<<< Updated upstream
                               f'Total Cost: R{total_cost}',
+=======
+                              f'Total Cost: {total_cost}',
+>>>>>>> Stashed changes
                               font_size=16, text_size=(500, None), valign='middle', halign='left', size_hint=(1, None), height=400)
 
         summary_label.height = len(summary_label.text.split(
@@ -344,7 +503,11 @@ class PrintMenu(BoxLayout):
             Clock.schedule_once(
                 lambda dt: self.dismiss_popup(print_success_popup), 3)
             Clock.schedule_once(
+<<<<<<< Updated upstream
                 lambda dt: self.dismiss_preview(), 4)
+=======
+                lambda dt: self.dismiss_preview(), 3)
+>>>>>>> Stashed changes
 
         except Exception as e:
             error_message = str(e)
@@ -355,6 +518,7 @@ class PrintMenu(BoxLayout):
                 size_hint=(None, None), size=(400, 200))
             popup.open()
             Clock.schedule_once(lambda dt: self.dismiss_popup(popup), 4)
+<<<<<<< Updated upstream
 
     def generate_print_command(self):
         # Generate the print command based on the selected printer, number of copies, page numbers, and print color
@@ -385,6 +549,38 @@ class PrintMenu(BoxLayout):
         return True
 
 
+=======
+
+    def generate_print_command(self):
+        # Generate the print command based on the selected printer, number of copies, page numbers, and print color
+        file_path = self.file_label.text
+        page_numbers = self.preview_page_numbers_input.text
+
+        if page_numbers.lower() == 'all':
+            print_command = ["lp", "-n",
+                             str(self.preview_copies_input.text), file_path]
+        elif '-' in page_numbers:
+            start_page, end_page = page_numbers.split('-')
+            print_command = [
+                "lp", "-n", str(self.preview_copies_input.text), "-P", f"{start_page}-{end_page}", file_path]
+        else:
+            print_command = [
+                "lp", "-n", str(self.preview_copies_input.text), "-P", page_numbers, file_path]
+
+        return print_command
+
+    def validate_input(self):
+        if not self.preview_page_numbers_input.text or not self.preview_copies_input.text:
+            popup = Popup(title='Error', content=Label(
+                text='Please enter both page numbers and copies'),
+                size_hint=(None, None), size=(400, 200))
+            popup.open()
+            Clock.schedule_once(lambda dt: self.dismiss_popup(popup), 2)
+            return False
+        return True
+
+
+>>>>>>> Stashed changes
 class MyApp(App):
     def build(self):
         return PrintMenu()
